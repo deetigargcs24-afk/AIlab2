@@ -1,0 +1,99 @@
+
+#include <iostream>
+#include <vector>
+#include <string>
+using namespace std;
+
+struct Fact {
+    string predicate;
+    string subject;
+};
+
+int main() {
+
+    vector<Fact> facts;
+
+    // Initial knowledge base
+    facts.push_back({"Human", "Socrates"});
+
+    // Rules
+    // Human(x) -> Mortal(x)
+    // Mortal(x) -> Dies(x)
+
+    vector<pair<string, string>> rules = {
+        {"Human", "Mortal"},
+        {"Mortal", "Dies"}
+    };
+
+    string queryPredicate = "Dies";
+    string querySubject = "Socrates";
+
+    cout << "Initial Knowledge Base:\n";
+
+    for (auto f : facts) {
+        cout << f.predicate << "("
+             << f.subject << ")\n";
+    }
+
+    cout << "\nApplying Forward Chaining:\n";
+
+    bool newFact = true;
+
+    while (newFact) {
+
+        newFact = false;
+
+        for (auto rule : rules) {
+
+            for (auto fact : facts) {
+
+                if (fact.predicate == rule.first) {
+
+                    Fact derived;
+                    derived.predicate = rule.second;
+                    derived.subject = fact.subject;
+
+                    bool exists = false;
+
+                    for (auto f : facts) {
+                        if (f.predicate == derived.predicate &&
+                            f.subject == derived.subject) {
+                            exists = true;
+                            break;
+                        }
+                    }
+
+                    if (!exists) {
+                        facts.push_back(derived);
+                        cout << "Derived: "
+                             << derived.predicate
+                             << "(" << derived.subject << ")\n";
+
+                        newFact = true;
+                    }
+                }
+            }
+        }
+    }
+
+    // Check query
+    bool proved = false;
+
+    for (auto f : facts) {
+        if (f.predicate == queryPredicate &&
+            f.subject == querySubject) {
+            proved = true;
+            break;
+        }
+    }
+
+    cout << "\nQuery: " << queryPredicate
+         << "(" << querySubject << ")\n";
+
+    if (proved)
+        cout << "Query is PROVED using Forward Chaining!";
+    else
+        cout << "Query cannot be proved!";
+
+    return 0;
+}

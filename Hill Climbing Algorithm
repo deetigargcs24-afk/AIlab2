@@ -1,0 +1,81 @@
+
+#include <iostream>
+using namespace std;
+
+#define N 10
+
+int graph[N][N];
+int h[N];
+bool visited[N];
+
+void hillClimbing(int start, int goal, int n) {
+    int current = start;
+
+    cout << "\nPath: " << current;
+
+    while (current != goal) {
+        int next = -1;
+        int bestValue = h[current];
+
+        visited[current] = true;
+
+        // Find the best neighbouring node
+        for (int i = 0; i < n; i++) {
+            if (graph[current][i] == 1 && !visited[i]) {
+
+                if (h[i] > bestValue) {
+                    bestValue = h[i];
+                    next = i;
+                }
+            }
+        }
+
+        // No better neighbour found
+        if (next == -1) {
+            cout << "\nStuck at local maximum!";
+            return;
+        }
+
+        current = next;
+        cout << " -> " << current;
+    }
+
+    cout << "\nGoal Reached!";
+}
+
+int main() {
+    int n, e;
+    int u, v;
+    int start, goal;
+
+    cout << "Enter number of nodes: ";
+    cin >> n;
+
+    cout << "Enter number of edges: ";
+    cin >> e;
+
+    cout << "Enter edges:\n";
+
+    for (int i = 0; i < e; i++) {
+        cin >> u >> v;
+        graph[u][v] = 1;
+        graph[v][u] = 1;
+    }
+
+    cout << "Enter heuristic values:\n";
+
+    for (int i = 0; i < n; i++) {
+        cout << "h(" << i << "): ";
+        cin >> h[i];
+    }
+
+    cout << "Enter start node: ";
+    cin >> start;
+
+    cout << "Enter goal node: ";
+    cin >> goal;
+
+    hillClimbing(start, goal, n);
+
+    return 0;
+}

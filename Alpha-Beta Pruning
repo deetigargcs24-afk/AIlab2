@@ -1,0 +1,79 @@
+
+#include <iostream>
+#include <climits>
+using namespace std;
+
+int alphaBeta(int depth, int nodeIndex,
+              bool isMax, int values[],
+              int alpha, int beta,
+              int maxDepth) {
+
+    // Leaf node
+    if (depth == maxDepth)
+        return values[nodeIndex];
+
+    if (isMax) {
+        int best = INT_MIN;
+
+        for (int i = 0; i < 2; i++) {
+
+            int val = alphaBeta(
+                depth + 1,
+                nodeIndex * 2 + i,
+                false, values,
+                alpha, beta, maxDepth
+            );
+
+            best = max(best, val);
+            alpha = max(alpha, best);
+
+            // Pruning condition
+            if (beta <= alpha)
+                break;
+        }
+
+        return best;
+    }
+
+    else {
+        int best = INT_MAX;
+
+        for (int i = 0; i < 2; i++) {
+
+            int val = alphaBeta(
+                depth + 1,
+                nodeIndex * 2 + i,
+                true, values,
+                alpha, beta, maxDepth
+            );
+
+            best = min(best, val);
+            beta = min(beta, best);
+
+            // Pruning condition
+            if (beta <= alpha)
+                break;
+        }
+
+        return best;
+    }
+}
+
+int main() {
+
+    int values[8];
+
+    cout << "Enter 8 leaf node values:\n";
+
+    for (int i = 0; i < 8; i++)
+        cin >> values[i];
+
+    int result = alphaBeta(
+        0, 0, true, values,
+        INT_MIN, INT_MAX, 3
+    );
+
+    cout << "\nOptimal value: " << result;
+
+    return 0;
+}

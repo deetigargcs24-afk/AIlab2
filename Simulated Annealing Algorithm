@@ -1,0 +1,64 @@
+
+#include <iostream>
+#include <cmath>
+#include <cstdlib>
+#include <ctime>
+using namespace std;
+
+// Objective function
+double objective(int x) {
+    return 100 - (x - 10) * (x - 10);
+}
+
+int main() {
+    srand(time(0));
+
+    int current = rand() % 21;
+    int best = current;
+
+    double temperature = 100.0;
+    double coolingRate = 0.95;
+
+    while (temperature > 0.1) {
+
+        // Generate a neighbouring solution
+        int next = current + (rand() % 3 - 1);
+
+        if (next < 0 || next > 20) {
+            temperature *= coolingRate;
+            continue;
+        }
+
+        double currentValue = objective(current);
+        double nextValue = objective(next);
+
+        double delta = nextValue - currentValue;
+
+        // Accept better solution
+        if (delta > 0) {
+            current = next;
+        }
+        // Sometimes accept worse solution
+        else {
+            double probability = exp(delta / temperature);
+            double randomValue = (double)rand() / RAND_MAX;
+
+            if (randomValue < probability) {
+                current = next;
+            }
+        }
+
+        // Update best solution
+        if (objective(current) > objective(best)) {
+            best = current;
+        }
+
+        // Reduce temperature
+        temperature *= coolingRate;
+    }
+
+    cout << "\nBest Solution: " << best;
+    cout << "\nMaximum Value: " << objective(best);
+
+    return 0;
+}

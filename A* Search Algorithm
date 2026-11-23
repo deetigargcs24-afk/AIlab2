@@ -1,0 +1,114 @@
+
+#include <iostream>
+#include <climits>
+using namespace std;
+
+#define N 10
+
+int graph[N][N];
+int h[N];
+bool visited[N];
+
+void AStar(int start, int goal, int n) {
+    int g[N], f[N], parent[N];
+
+    for (int i = 0; i < n; i++) {
+        g[i] = INT_MAX;
+        f[i] = INT_MAX;
+        parent[i] = -1;
+        visited[i] = false;
+    }
+
+    g[start] = 0;
+    f[start] = h[start];
+
+    while (true) {
+        int current = -1;
+        int minF = INT_MAX;
+
+        // Select node with minimum f value
+        for (int i = 0; i < n; i++) {
+            if (!visited[i] && f[i] < minF) {
+                minF = f[i];
+                current = i;
+            }
+        }
+
+        if (current == -1) {
+            cout << "Path not found!";
+            return;
+        }
+
+        if (current == goal)
+            break;
+
+        visited[current] = true;
+
+        // Explore neighbours
+        for (int i = 0; i < n; i++) {
+            if (graph[current][i] > 0 && !visited[i]) {
+
+                int newG = g[current] + graph[current][i];
+
+                if (newG < g[i]) {
+                    g[i] = newG;
+                    f[i] = g[i] + h[i];
+                    parent[i] = current;
+                }
+            }
+        }
+    }
+
+    // Print path
+    int path[N], count = 0;
+    int temp = goal;
+
+    while (temp != -1) {
+        path[count++] = temp;
+        temp = parent[temp];
+    }
+
+    cout << "\nShortest Path: ";
+
+    for (int i = count - 1; i >= 0; i--)
+        cout << path[i] << " ";
+
+    cout << "\nTotal Cost: " << g[goal] << endl;
+}
+
+int main() {
+    int n, e;
+    int u, v, w;
+    int start, goal;
+
+    cout << "Enter number of nodes: ";
+    cin >> n;
+
+    cout << "Enter number of edges: ";
+    cin >> e;
+
+    cout << "Enter edges (u v cost):\n";
+
+    for (int i = 0; i < e; i++) {
+        cin >> u >> v >> w;
+        graph[u][v] = w;
+        graph[v][u] = w;
+    }
+
+    cout << "Enter heuristic values:\n";
+
+    for (int i = 0; i < n; i++) {
+        cout << "h(" << i << "): ";
+        cin >> h[i];
+    }
+
+    cout << "Enter start node: ";
+    cin >> start;
+
+    cout << "Enter goal node: ";
+    cin >> goal;
+
+    AStar(start, goal, n);
+
+    return 0;
+}

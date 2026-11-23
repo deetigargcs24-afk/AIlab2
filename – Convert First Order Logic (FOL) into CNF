@@ -1,0 +1,43 @@
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+string removeImplication(string s) {
+    string result = "";
+
+    for (int i = 0; i < s.length(); i++) {
+        if (i + 1 < s.length() && s[i] == '-' && s[i + 1] == '>') {
+            result += "|!";
+            i++;
+        }
+        else {
+            result += s[i];
+        }
+    }
+
+    return result;
+}
+
+int main() {
+    string expression;
+
+    cout << "Enter logical expression: ";
+    getline(cin, expression);
+
+    cout << "\nOriginal Expression: " << expression;
+
+    string result = removeImplication(expression);
+
+    cout << "\nAfter removing implication: " << result;
+
+    cout << "\n\nCNF conversion requires:";
+    cout << "\n1. Remove implications";
+    cout << "\n2. Apply De Morgan's law";
+    cout << "\n3. Standardize variables";
+    cout << "\n4. Apply Skolemization";
+    cout << "\n5. Remove universal quantifiers";
+    cout << "\n6. Distribute OR over AND";
+
+    return 0;
+}

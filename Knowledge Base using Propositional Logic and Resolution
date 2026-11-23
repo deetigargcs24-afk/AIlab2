@@ -1,0 +1,127 @@
+
+#include <iostream>
+#include <vector>
+#include <set>
+#include <algorithm>
+using namespace std;
+
+// Check whether a clause contains complementary literals
+bool isTautology(vector<int> c) {
+    for (int x : c) {
+        if (find(c.begin(), c.end(), -x) != c.end())
+            return true;
+    }
+    return false;
+}
+
+// Resolve two clauses
+vector<vector<int>> resolve(vector<int> a, vector<int> b) {
+    vector<vector<int>> result;
+
+    for (int x : a) {
+        if (find(b.begin(), b.end(), -x) != b.end()) {
+
+            vector<int> res;
+
+            for (int y : a)
+                if (y != x)
+                    res.push_back(y);
+
+            for (int y : b)
+                if (y != -x)
+                    res.push_back(y);
+
+            sort(res.begin(), res.end());
+            res.erase(unique(res.begin(), res.end()), res.end());
+
+            if (!isTautology(res))
+                result.push_back(res);
+        }
+    }
+
+    return result;
+}
+
+bool resolution() {
+
+    // P = 1, Q = 2, R = 3
+    // KB: P -> Q, P, Q -> R
+    // Negation of query: !R
+
+    vector<vector<int>> clauses = {
+        {-1, 2},  // !P OR Q
+        {1},      // P
+        {-2, 3},  // !Q OR R
+        {-3}      // !R
+    };
+
+    set<vector<int>> known;
+
+    for (auto c : clauses)
+        known.insert(c);
+
+    cout << "Initial Clauses:\n";
+
+    for (auto c : clauses) {
+        for (int x : c)
+            cout << (x < 0 ? "!" : "") << char('P' + abs(x) - 1) << " ";
+        cout << endl;
+    }
+
+    cout << "\nApplying Resolution:\n";
+
+    while (true) {
+
+        vector<vector<int>> current(
+            known.begin(), known.end());
+
+        bool changed = false;
+
+        for (int i = 0; i < current.size(); i++) {
+            for (int j = i + 1; j < current.size(); j++) {
+
+                vector<vector<int>> res =
+                    resolve(current[i], current[j]);
+
+                for (auto c : res) {
+
+                    if (c.empty()) {
+                        cout << "Empty clause derived!\n";
+                        return true;
+                    }
+
+                    if (known.insert(c).second) {
+                        changed = true;
+
+                        cout << "New clause: ";
+
+                        for (int x : c)
+                            cout << (x < 0 ? "!" : "")
+                                 << char('P' + abs(x) - 1)
+                                 << " ";
+
+                        cout << endl;
+                    }
+                }
+            }
+        }
+
+        if (!changed)
+            break;
+    }
+
+    return false;
+}
+
+int main() {
+
+    cout << "Knowledge Base using Resolution\n";
+    cout << "Query: R (Road is slippery)\n\n";
+
+    if (resolution())
+        cout << "\nKB entails the query!";
+    else
+        cout << "\nKB does NOT entail the query!";
+
+    return 0;
+}
